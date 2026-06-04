@@ -2,7 +2,7 @@
 #IMPORT GUIDE
 --------------------------------------------------------------
 
-MESH CHECKER & TWIST JOINTS: 
+MESH CHECKER 
 Importing the scripts and making a shelf tool: 
 Download toolsForMaya folder (ill upload..soon) 
 Put folder into documents -> maya -> scripts
@@ -16,24 +16,9 @@ How to use mesh Checker:
  - Select a mesh, then press the shelf button, this opens UI (at a later time ill fix so it opens without selecting)
  - From here you can safely analyze new meshes without cluttering the hierarchy as only ONE checkmesh can be active at a time
  - Using the select buttons you can select the offending bad topology on the ORIGINAL mesh, the check mesh is ONLY for templating. Script does allat on its own.
- - IF errors, pls tell me <3 
+ - IF errors, pls tell me <3
 
-
-How to use twist joints generator: 
- - Press the shelf button to get up ui
- - Select start and end joint (ensure these have correct naming, for the twist renaming to work) 
- - Choose your twist axis, according to our guidelines(probably x)
- - Options for choosing how many twist joints, again follow guidelines. 
- - Hit the button and wowie you've got twist joints. 
- - Rinse repeat for whatever limb you want
-
---------------------------------------------------------------
-#TwistJoint 1.0 RUN script: 
---------------------------------------------------------------
-
-from toolsForMaya import twistJoints
-twistJoints.createUI()
-
+   
 --------------------------------------------------------------
 #MeshChecker RUN 1.0 script: 
 --------------------------------------------------------------
