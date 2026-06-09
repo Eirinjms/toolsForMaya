@@ -1,5 +1,5 @@
-from autoRigTool import shapes as shapes
-import maya.cmds as cmds
+from autoRigger import shapes as shapes
+import maya.cmds as cmds# pyright: ignore[reportMissingImports] 
 import importlib
 
 importlib.reload(shapes)
