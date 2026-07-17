@@ -1,7 +1,7 @@
 import maya.cmds as cmds# pyright: ignore[reportMissingImports] 
 import os
+import time
 from PySide6.QtCore import QTimer# pyright: ignore[reportMissingImports] 
-import math
 
 class AutoSaver:
 
@@ -30,7 +30,7 @@ class AutoSaver:
     def start(self):
         self.iterations = cmds.textField(self.iteration, q=True, text=True)
         minutes = float(self.iterations)
-        minutes = int(math.ceil(minutes))
+        minutes = int(round(minutes))
         milliseconds = minutes * 60 * 1000
         self.timer.start(milliseconds)
         print(f"Autosave started ({minutes} min interval)")
@@ -66,29 +66,50 @@ class AutoSaver:
         else: 
             cmds.file(rename = f"{scene.replace('.ma', '_' )}01")
 
-        print('Saving your file babygirl...')
+        print('Saving your file...')
         cmds.file(save = True)
         cmds.deleteUI(window, window = True)
+
+    
+    def findElapsedTime(self) -> float:
+        scene = cmds.file(q = True, sceneName = True)
+
+        if not scene:
+            return 0
+        todaysDate = time.time() 
+
+        timestamp = os.path.getmtime(scene)
+
+        elapsedTime = todaysDate - timestamp
+
+        return elapsedTime
+
         
     def perform_autosave(self):
-        if cmds.window("Friendly Reminder", exists=True):
-            cmds.deleteUI("Friendly Reminder")
+        if cmds.window("Friendly_Reminder", exists=True):
+            cmds.deleteUI("Friendly_Reminder")
 
-        window = cmds.window( title="Friendly Reminder", iconName='Short Name', resizeToFitChildren=True, widthHeight=(400, 100) )
+        window = cmds.window("Friendly_Reminder", title="Friendly Reminder", iconName='Short Name', resizeToFitChildren=True, widthHeight=(400, 100) )
 
         mainColumn = cmds.columnLayout(adjustableColumn = True)
         cmds.separator(height=10, style="none")
         cmds.rowLayout(numberOfColumns=2, adjustableColumn=2)
-        
-        cmds.text("It's been long since u saved pookie :(", font = 'boldLabelFont')
-        cmds.image(image="C:/Users/Eirso/OneDrive/Bilder/owowown2.png")
+
+        seconds = int(self.findElapsedTime())
+
+        hours = seconds // 3600
+        minutes = (seconds % 3600) // 60
+        seconds = seconds % 60
+
+        cmds.text(f"It's been {hours}h {minutes}m since last save", font = 'boldLabelFont')
+        #cmds.image(image="C:/Users/Eirso/OneDrive/Bilder/owowown2.png")
 
         cmds.setParent(mainColumn)
         cmds.separator(height=10, style="none")
 
-        cmds.button( label= "Save?" ,command =lambda *_: self.saving(window=window))
-        cmds.button(label = 'increment?', command = lambda *_: self.saving_increment(window = window))
-        cmds.button( label='Hurt owowon and ignore it :(', command=('cmds.deleteUI(\"' + window + '\", window=True)') )
+        cmds.button( label= "Save current file?" ,command =lambda *_: self.saving(window=window))
+        cmds.button(label = 'increment new file?', command = lambda *_: self.saving_increment(window = window))
+        cmds.button(label='Ignore', command=(lambda *_: cmds.deleteUI(window, window=True)))
 
         cmds.showWindow( window )
 
