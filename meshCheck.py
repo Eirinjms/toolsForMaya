@@ -3,54 +3,62 @@ import maya.cmds as cmds
 class TopologyChecker:
     def __init__(self):
         self.new_run = False
-
-    def meshSetup(self):
         self.mesh = cmds.ls(sl=True)
-
-        if len(self.mesh) == 0:
-            cmds.warning('No meshes selected. Please select one mesh and try again')
-            return
-
-        if len(self.mesh) >1:
-            cmds.warning('Multiple meshes selected. Please select one mesh and try again')
-            return
-         
-        if self.new_run:
-            if self.mesh == []:
-                cmds.warning('Template mesh selected, please choose a new mesh and try again')
-                return    
-            if self.mesh and self.mesh[0].endswith("_topoCheckMesh"):
-                cmds.warning('Template mesh selected, please select a new mesh and try again')
-                cmds.select(cl = True)
-                return  
-                    
-        # Duplicate mesh for non-destructive debug
-        if cmds.objExists("*_topoCheckMesh"):
-            cmds.delete("*_topoCheckMesh")
-        
-        self.checkMesh = cmds.duplicate(self.mesh[0], n=f"{self.mesh[0]}_topoCheckMesh")[0]
-        self.checkMeshShape = cmds.listRelatives(self.checkMesh, s=True)[0]
-        
-        self.template = True
-        cmds.setAttr(self.checkMesh + ".template", self.template)
-
-        # Clean display
-        cmds.polySoftEdge(self.checkMesh, a=180, ch=True)
-        cmds.setAttr(f"{self.checkMeshShape}.displayEdges", 2)
-        cmds.setAttr(f"{self.checkMeshShape}.displayColors", 1)
-
-        cmds.displayRGBColor('hardedgeHilite', 0, 1, 0)
-
-        self.verts = cmds.ls(self.checkMesh + '.vtx[*]', fl=True)
-        self.faces = cmds.ls(self.checkMesh + '.f[*]', fl=True)
-        self.max = len(self.verts)
-        self.counter = 0
 
         self.tris = []
         self.ngonsList = []
         self.poles = []
         self.nonManFaces = []
         self.sixStars = []
+
+    def meshSetup(self):
+        if len(self.mesh) == 0:
+            cmds.warning('No meshes selected. Please select one mesh and try again')
+            return
+
+        if len(self.mesh) > 1:
+            cmds.warning('Multiple meshes selected. Please select one mesh and try again')
+            return
+
+        if self.new_run:
+            if self.mesh == []:
+                cmds.warning('Template mesh selected, please choose a new mesh and try again')
+                return
+            if self.mesh and self.mesh[0].endswith("_topoCheckMesh"):
+                cmds.warning('Template mesh selected, please select a new mesh and try again')
+                cmds.select(cl=True)
+                return
+
+        self.verts = cmds.ls(self.mesh[0] + '.vtx[*]', fl=True)
+        self.faces = cmds.ls(self.mesh[0] + '.f[*]', fl=True)
+        self.max = len(self.verts)
+        self.counter = 0
+
+    def duplicateMesh(self):
+        if cmds.objExists("*_topoCheckMesh"):
+            cmds.delete("*_topoCheckMesh")
+
+        self.checkMesh = cmds.duplicate(self.mesh[0], n=f"{self.mesh[0]}_topoCheckMesh")[0]
+        self.checkMeshShape = cmds.listRelatives(self.checkMesh, s=True)[0]
+
+        self.template = True
+        cmds.setAttr(self.checkMesh + ".template", self.template)
+
+        cmds.polySoftEdge(self.checkMesh, a=180, ch=True)
+        cmds.setAttr(f"{self.checkMeshShape}.displayEdges", 2)
+        cmds.setAttr(f"{self.checkMeshShape}.displayColors", 1)
+        cmds.displayRGBColor('hardedgeHilite', 0, 1, 0)
+
+    def vertConfirm(self):
+        result = "Analyse it"
+        if self.max > 100_000:
+            result = cmds.confirmDialog(
+                message= f"Are you really sure you wanna do this buddy? selected mesh has {len(self.verts):,} vertices and could take a while or crash maya :(",
+                button = ["Analyse it", "Cancel"],
+                defaultButton = "Analyse it",
+                cancelButton = "Cancel")
+        
+        return result
 
     def progressBar(self):
         cmds.progressWindow(
@@ -277,6 +285,9 @@ class TopologyChecker:
             self.new_run=new_run_state
 
         self.meshSetup()
+        if self.vertConfirm() == "Cancel":
+            return
+        self.duplicateMesh()
         self.progressBar()
         self.locateTriangles()
         self.locateNGons()
