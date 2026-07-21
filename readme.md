@@ -26,3 +26,18 @@ How to use mesh Checker:
 from toolsForMaya import meshCheck
 meshCheck.TopologyChecker().runTool()
 
+
+--------------------------------------------------------------
+#save reminder RUN 1.0 script: 
+--------------------------------------------------------------
+
+from toolsForMaya import autoSaver #or whatever folder youve put it in
+
+#start timer: 
+autosaver = autoSaver.AutoSaver()
+autosaver.configWindow()
+
+#stop timer: 
+autosaver = autoSaver.AutoSaver()
+autosaver.stop()
+
