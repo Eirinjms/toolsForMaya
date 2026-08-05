@@ -46,28 +46,35 @@ class AutoSaver:
         cmds.deleteUI(window, window=True)
 
     def saving_increment(self, *args, window):
-        scene = cmds.file(q = True, sceneName = True)
-        scene_name = os.path.basename(scene)
-        scene_ma = scene_name.replace(".ma", "")
+        scene = cmds.file(q=True, sceneName=True)
+
+        folder = os.path.dirname(scene)
+        filename = os.path.basename(scene)
+
+        name, ext = os.path.splitext(filename)
 
         integ = []
 
-        for i in range(len(scene_ma)):
-            letter = scene_ma[i]
+        for letter in name:
             if letter.isdigit():
                 integ.append(letter)
-            else:
-                continue
 
         integ = "".join(integ)
-        if len(integ) > 0:
-            integ_new = int(integ) + 1
-            cmds.file(rename = f"{scene_ma.replace(str(integ),'')}{integ_new:02}")
-        else: 
-            cmds.file(rename = f"{scene.replace('.ma', '_' )}01")
 
-        print('Saving your file...')
-        cmds.file(save = True)
+        if integ:
+            integ_new = int(integ) + 1
+            new_name = f"{name.replace(integ, '')}{integ_new:02}{ext}"
+        else:
+            new_name = f"{name}_01{ext}"
+
+        new_path = os.path.join(folder, new_name)
+
+        cmds.file(rename=new_path)
+
+        print("Saving your file...")
+
+        cmds.file(save=True)
+
         cmds.deleteUI(window, window = True)
 
     
@@ -102,7 +109,7 @@ class AutoSaver:
         seconds = seconds % 60
 
         cmds.text(f"It's been {hours}h {minutes}m since last save", font = 'boldLabelFont')
-        #cmds.image(image="C:/Users/Eirso/OneDrive/Bilder/owowown2.png")
+        cmds.image(image="C:/Users/Eirso/OneDrive/Bilder/owowown2.png")
 
         cmds.setParent(mainColumn)
         cmds.separator(height=10, style="none")
