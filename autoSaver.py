@@ -109,7 +109,7 @@ class AutoSaver:
         seconds = seconds % 60
 
         cmds.text(f"It's been {hours}h {minutes}m since last save", font = 'boldLabelFont')
-        cmds.image(image="C:/Users/Eirso/OneDrive/Bilder/owowown2.png")
+        #cmds.image(image="C:/Users/Eirso/OneDrive/Bilder/owowown2.png")
 
         cmds.setParent(mainColumn)
         cmds.separator(height=10, style="none")
