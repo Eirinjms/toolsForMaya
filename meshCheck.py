@@ -3,22 +3,21 @@ import maya.cmds as cmds
 class TopologyChecker:
     def __init__(self):
         self.new_run = False
+    def meshSetup(self):
         self.mesh = cmds.ls(sl=True)
-
         self.tris = []
         self.ngonsList = []
         self.poles = []
         self.nonManFaces = []
         self.sixStars = []
 
-    def meshSetup(self):
-        if len(self.mesh) == 0:
+        if not self.mesh:
             cmds.warning('No meshes selected. Please select one mesh and try again')
-            return
+            return False
 
         if len(self.mesh) > 1:
             cmds.warning('Multiple meshes selected. Please select one mesh and try again')
-            return
+            return False
 
         if self.new_run:
             if self.mesh == []:
@@ -38,8 +37,11 @@ class TopologyChecker:
         if cmds.objExists("*_topoCheckMesh"):
             cmds.delete("*_topoCheckMesh")
 
-        self.checkMesh = cmds.duplicate(self.mesh[0], n=f"{self.mesh[0]}_topoCheckMesh")[0]
-        self.checkMeshShape = cmds.listRelatives(self.checkMesh, s=True)[0]
+        if self.mesh: 
+            self.checkMesh = cmds.duplicate(self.mesh[0], n=f"{self.mesh[0]}_topoCheckMesh")[0]
+            self.checkMeshShape = cmds.listRelatives(self.checkMesh, s=True)[0]
+        else: 
+            return cmds.warning("No mesh selected")
 
         self.template = True
         cmds.setAttr(self.checkMesh + ".template", self.template)
@@ -168,8 +170,16 @@ class TopologyChecker:
         cmds.columnLayout(adj = True, mar = 5)
 
         check = "Topology check complete!"
-        if len(self.ngonsList) == 0: 
+
+        if len(self.ngonsList) > 0 and len(self.nonManFaces) > 0 and len(self.tris) > 0:
+            cmds.text(label= f"{check} Consider a change in career", align='center', height=30, font='boldLabelFont')
+
+        elif len(self.ngonsList) == 0 and len(self.nonManFaces) == 0 and len(self.tris) > 0: 
+            cmds.text(label= f"{check} Not terrible, you're fine. ", align='center', height=30, font='boldLabelFont')
+        
+        elif len(self.ngonsList) == 0 and len(self.nonManFaces) == 0: 
             cmds.text(label= f"{check} You're awesome! :D ", align='center', height=30, font='boldLabelFont')
+            
         else: 
             cmds.text(label= f"{check} You suck! D: ", align='center', height=30, font='boldLabelFont')
         cmds.separator(height=15, st = "shelf")
@@ -285,8 +295,11 @@ class TopologyChecker:
             self.new_run=new_run_state
 
         self.meshSetup()
+        if not self.mesh:
+            return
         if self.vertConfirm() == "Cancel":
             return
+
         self.duplicateMesh()
         self.progressBar()
         self.locateTriangles()
