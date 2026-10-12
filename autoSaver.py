@@ -45,7 +45,7 @@ class AutoSaver:
         print("saving finished! :D")
         cmds.deleteUI(window, window=True)
 
-    def saving_increment(self, *args, window):
+    def saving_increment(self, *args, window=None):
         scene = cmds.file(q=True, sceneName=True)
 
         folder = os.path.dirname(scene)
@@ -74,8 +74,10 @@ class AutoSaver:
         print("Saving your file...")
 
         cmds.file(save=True)
-
-        cmds.deleteUI(window, window = True)
+        try:
+            cmds.deleteUI(window, window = True)
+        finally:
+            print("File saved")
 
     
     def findElapsedTime(self) -> float:
@@ -96,7 +98,11 @@ class AutoSaver:
         if cmds.window("Friendly_Reminder", exists=True):
             cmds.deleteUI("Friendly_Reminder")
 
-        window = cmds.window("Friendly_Reminder", title="Friendly Reminder", iconName='Short Name', resizeToFitChildren=True, widthHeight=(400, 100) )
+        window = cmds.window("Friendly_Reminder", 
+                             title="Friendly Reminder", 
+                             iconName='Short Name', 
+                             resizeToFitChildren=True, 
+                             widthHeight=(400, 100) )
 
         mainColumn = cmds.columnLayout(adjustableColumn = True)
         cmds.separator(height=10, style="none")
@@ -109,7 +115,7 @@ class AutoSaver:
         seconds = seconds % 60
 
         cmds.text(f"It's been {hours}h {minutes}m since last save", font = 'boldLabelFont')
-        #cmds.image(image="C:/Users/Eirso/OneDrive/Bilder/owowown2.png")
+        cmds.image(image="C:/Users/Eirso/OneDrive/Bilder/owowown2.png")
 
         cmds.setParent(mainColumn)
         cmds.separator(height=10, style="none")
