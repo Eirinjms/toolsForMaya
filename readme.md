@@ -41,3 +41,9 @@ autosaver.configWindow()
 autosaver = autoSaver.AutoSaver()
 autosaver.stop()
 
+--------------------------------------------------------------
+#Rename tool RUN 1.0 script: 
+--------------------------------------------------------------
+from toolsForMaya.renamingTool import rename
+
+rename.runTool()
